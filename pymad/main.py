@@ -34,14 +34,19 @@ def mad(tree):
         # -------------------------------------------
         # A) Split pairs of nodes for this branch
         # -------------------------------------------
+        if branch.length == None:
+            continue
+
+        dij = branch.length
+        head = branch.head_node
 
         # Split all pairs of nodes in to straddling or same-side pairs
-        pair_strad, pair_same = distances.split_node_pairs(branch, tree)
+        pairs_strad, pairs_same = distances.split_node_pairs(branch, tree)
 
         # Initialize the deviation score array for current branch
         n_strad = len(pairs_strad)
         n_same = len(pairs_same)
-        rbca = np.empty(n_straddle+n_same_side, dtype=float)
+        rbca = np.empty(n_strad+n_same, dtype=float)
 
         # -------------------------------------------
         # B) Calculate deviation for straddling pairs
@@ -60,16 +65,16 @@ def mad(tree):
 
         # Calculate distance from leaf to branch
         dab = dbi + dij*rho
-        rbca[:n_straddle] = np.abs(2*dab/dbc-1)
+        rbca[:n_strad] = np.abs(2*dab/dbc-1)
 
         # -------------------------------------------
         # C) Calculate deviation for same side pairs
         # -------------------------------------------
 
         # Calculate deviation for same-side node pairs
-        dbc_same = np.array([matrix[n1.label][n2.label] for n1, n2 in pairs_same_side])
-        dab_same = np.array([dist(head,n1) for n1, n2 in pairs_same_side])
-        rbca[n_straddle:] = np.abs(2*dab_same/dbc_same-1)
+        dbc_same = np.array([pair_matrix[n1.label][n2.label] for n1, n2 in pairs_same])
+        dab_same = np.array([dist_method(head,n1) for n1, n2 in pairs_same])
+        rbca[n_strad:] = np.abs(2*dab_same/dbc_same-1)
 
         # -------------------------------------------
         # D) Calculate root-mean-square deviation for branch
@@ -85,8 +90,8 @@ def mad(tree):
     sorted_branches = branches.sort_values(ascending=False)
 
     # Get best branch from MAD list
-    ideal_branch = sorted_branches.iloc[0].index
-    ideal_branch2 = sorted_branches.iloc[1].index
+    ideal_branch = sorted_branches.index[0]
+    ideal_branch2 = sorted_branches.index[1]
 
     # find position of new root node.
     dij = ideal_branch.length
