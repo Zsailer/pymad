@@ -1,7 +1,7 @@
 import dendropy as dp
 from collections import Counter
 
-def load(path, schema="newick"):
+def load_tree(path, schema="newick"):
     """Read a tree from file and run quality controls.
     """
     tree = dp.Tree.get(path=path, schema=schema)
