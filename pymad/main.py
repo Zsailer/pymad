@@ -95,13 +95,23 @@ def mad(tree):
 
     # find position of new root node.
     dij = ideal_branch.length
-    length1 = rhos[ideal_branch] *  dij
-    length2 = dij - length1
-
+    length2 = rhos[ideal_branch] *  dij
+    length1 = dij - length2
     # ---------------------------------------------------------
     # 4) Reroot tree.
     # ---------------------------------------------------------
-    tree.reroot_at_edge(ideal_branch, length1=length1, length2=length2, update_bipartitions=True)
+
+    # WARNING:This is a hack to overcome a bug in DendroPy. Needs fixing later!
+    old_method = tree.collapse_basal_bifurcation
+    def collapse_basal_bifurcation(set_as_unrooted_tree=True):
+        return tree.seed_node
+    tree.collapse_basal_bifurcation = collapse_basal_bifurcation
+
+    # Do the rerooting
+    tree.reroot_at_edge(ideal_branch, length1=length1, length2=length2)
+
+    # WARNING: End of hack. Put old method back in.
+    tree.collapse_basal_bifurcation = old_method
 
     # ---------------------------------------------------------
     # 5) Calculate root ambiguity index

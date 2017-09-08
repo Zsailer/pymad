@@ -23,7 +23,7 @@ import pymad
 tree = pymad.load_tree("tree.nwk")
 
 # Root using the MAD algorithm
-new_tree, RAindex = spymad.mad(tree)
+new_tree, RAindex = pymad.mad(tree)
 ```
 
 ## Install
